@@ -16,11 +16,11 @@ Run:
 2. Have RethinkDB running. The test will try to create a new db and insert data to it.
 3. Run:
 
-    mvn install
+```mvn install```
 
 Maven should download the required dependencies and start running the test.
 
 
 ##Creating Ecplise project files##
 
-    mvn eclipse:eclipse -DdownloadJavadocs=true -DdownloadSources=true
+```mvn eclipse:eclipse -DdownloadJavadocs=true -DdownloadSources=true```
