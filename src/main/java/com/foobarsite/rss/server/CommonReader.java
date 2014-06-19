@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -193,27 +192,14 @@ public abstract class CommonReader implements FeedFetcherCache {
 		return null;
 	}
 
-	protected String nullToEmpty(Object obj) {
-		return obj == null ? "" : obj.toString();
-	}
-
-	protected void addToSetStr(Set<String> set, String idString) {
-		if (!StringTools.isBlankOrNull(idString)) {
-			String[] ids = idString.split(";");
-			for (String id : ids) {
-				set.add(id);
-			}
-		}
-	}
-
 	private String parseContent(SyndEntry syndEntry) {
 		String content = null;
 		Module module = syndEntry.getModule(ContentModule.URI);
 		if (module != null) {
 			ContentModule cmod = (ContentModule) module;
-			List encodeds = cmod.getEncodeds();
+			List<String> encodeds = cmod.getEncodeds();
 			if (encodeds != null && encodeds.size() > 0) {
-				content = (String) encodeds.get(0);
+				content = encodeds.get(0);
 			}
 		}
 

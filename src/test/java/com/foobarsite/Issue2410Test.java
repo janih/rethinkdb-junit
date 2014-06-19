@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ public class Issue2410Test extends FeedServer {
 			threadCount = Integer.valueOf(p.getProperty("threadCount"));
 			maxFeedCount = Integer.valueOf(p.getProperty("maxFeedCount"));
 			updateLoopCount = Integer.valueOf(p.getProperty("updateLoopCount"));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			fail(e.getMessage());
 		}
 	}
@@ -81,6 +80,16 @@ public class Issue2410Test extends FeedServer {
 			@Override
 			public String getDbName() {
 				return db;
+			}
+
+			@Override
+			public String getServerHost() {
+				return dbServerHost;
+			}
+
+			@Override
+			public int getServerPort() {
+				return dbServerPort;
 			}
 		};
 
@@ -102,7 +111,7 @@ public class Issue2410Test extends FeedServer {
 	@Test
 	public void testCase1() {
 		assertNotNull("HTTP server should not be null", server);
-		assertTrue("HTTP server should running", server.isAlive());
+		assertTrue("HTTP server should be running", server.isAlive());
 		assertNotNull("Reader should not be null", reader);
 
 		// 1. Insert

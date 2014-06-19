@@ -41,8 +41,6 @@ import com.foobarsite.rss.feed.impl.FeedItemImpl;
 
 public abstract class RethinkDBDAO extends CommonReader implements IFeedReader {
 	public static final Logger LOG = LoggerFactory.getLogger(RethinkDBDAO.class);
-	public static final String DB_SERVER_HOST = "localhost";
-	public static final int DB_SERVER_PORT = 28015;
 	public static final String LEFT_JOIN = "left";
 	public static final String RIGHT_JOIN = "right";
 
@@ -55,36 +53,38 @@ public abstract class RethinkDBDAO extends CommonReader implements IFeedReader {
 	private final HashMap<String,Object> feedIdIndex = new HashMap<String,Object>();
 	private final HashMap<String,Object> urlIndex = new HashMap<String,Object>();
 
-	private static ThreadLocal<RqlConnection> connectionTL = new ThreadLocal<RqlConnection>() {
-		@Override
-		protected RqlConnection initialValue() {
-			RqlConnection connection = null;
-			LOG.info("Creating new connection to {}:{}", DB_SERVER_HOST, DB_SERVER_PORT);
-			try {
-				connection = RqlConnection.connect(DB_SERVER_HOST, DB_SERVER_PORT);
-			} catch (RqlDriverException e) {
-				LOG.error(e.getMessage(), e);
-			}
-			return connection;
-		}
+	private static ThreadLocal<RqlConnection> connectionTL = null;
 
-		@Override
-		public void remove() {
-			LOG.info("Closing connection to {}:{}", DB_SERVER_HOST, DB_SERVER_PORT);
-			RqlConnection connection = get();
-			if (connection != null) {
+	public RethinkDBDAO() {
+		connectionTL = new ThreadLocal<RqlConnection>() {
+
+			@Override
+			protected RqlConnection initialValue() {
+				RqlConnection connection = null;
+				LOG.info("Creating new connection to {}:{}", getServerHost(), getServerPort());
 				try {
-					connection.close();
+					connection = RqlConnection.connect(getServerHost(), getServerPort());
 				} catch (RqlDriverException e) {
 					LOG.error(e.getMessage(), e);
 				}
+				return connection;
 			}
-			super.remove();
+
+			@Override
+			public void remove() {
+				LOG.info("Closing connection to {}:{}", getServerHost(), getServerPort());
+				RqlConnection connection = get();
+				if (connection != null) {
+					try {
+						connection.close();
+					} catch (RqlDriverException e) {
+						LOG.error(e.getMessage(), e);
+					}
+				}
+				super.remove();
+			};
 		};
 
-	};
-
-	public RethinkDBDAO() {
 		feedIdIndex.put("index", "feed_id");
 		urlIndex.put("index", "url");
 	}
@@ -725,6 +725,10 @@ public abstract class RethinkDBDAO extends CommonReader implements IFeedReader {
 
 	@Override
 	public abstract String getDbName();
+
+	public abstract int getServerPort();
+
+	public abstract String getServerHost();
 
 	protected RqlConnection getConnection() {
 		return connectionTL.get();
