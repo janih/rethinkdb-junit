@@ -528,9 +528,7 @@ public abstract class RethinkDBDAO extends CommonReader implements IFeedReader {
 	public int trimFeedUrlSlashes(List<String> ids) {
 		int counter = 0;
 		int updateCounter = 0;
-		long timeAll = System.currentTimeMillis();
-		long timeBatch = System.currentTimeMillis();
-		int batchSize = 100;
+		long time = System.currentTimeMillis();
 		try {
 			RqlConnection r = getConnection();
 			RqlCursor cursor = r.run(r.db(getDbName()).table(FeedProperty.TABLE_NAME.toString()).get_all(ids.toArray()));
@@ -547,25 +545,19 @@ public abstract class RethinkDBDAO extends CommonReader implements IFeedReader {
 						updateCounter++;
 					}
 					counter++;
-					if (counter % batchSize == 0) {
-						LOG.info("{} of {} feeds handled in {} ms.", batchSize, counter, (System.currentTimeMillis() - timeBatch));
-						timeBatch = System.currentTimeMillis();
-					}
 				}
 			}
 		} catch (RqlDriverException e) {
 			LOG.error(e.getMessage(), e);
 		}
-		LOG.info("{} items of {} trimmed in {} ms.", updateCounter, ids.size(), (System.currentTimeMillis() - timeAll));
+		LOG.info("{} items of {} trimmed in {} ms.", updateCounter, ids.size(), (System.currentTimeMillis() - time));
 		return counter;
 	}
 
 	@Override
 	public int trimItemWhiteSpace(List<String> ids) {
 		int counter = 0;
-		long timeAll = System.currentTimeMillis();
-		long timeBatch = System.currentTimeMillis();
-		int batchSize = 1000;
+		long time = System.currentTimeMillis();
 		try {
 			RqlConnection r = getConnection();
 			RqlCursor cursor = r.run(r.db(getDbName()).table(FeedItemProperty.TABLE_NAME.toString()).get_all(ids.toArray()));
@@ -576,17 +568,12 @@ public abstract class RethinkDBDAO extends CommonReader implements IFeedReader {
 					IFeedItem item = buildFeedItem(m, true);
 					saveItem(item);
 					counter++;
-					if (counter % batchSize == 0) {
-						LOG.info("{} of {} items trimmed in {} ms.", batchSize, counter, (System.currentTimeMillis() - timeBatch));
-						timeBatch = System.currentTimeMillis();
-					}
-
 				}
 			}
 		} catch (RqlDriverException e) {
 			LOG.error(e.getMessage(), e);
 		}
-		LOG.info("{} items trimmed in {} ms.", counter, (System.currentTimeMillis() - timeAll));
+		LOG.info("{} items trimmed in {} ms.", counter, (System.currentTimeMillis() - time));
 		return counter;
 	}
 

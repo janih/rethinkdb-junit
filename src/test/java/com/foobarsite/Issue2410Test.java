@@ -133,10 +133,10 @@ public class Issue2410Test extends FeedServer {
 		}
 		feedsToSave.clear();
 
-		List<String> ids = reader.getProperties(FeedProperty.TABLE_NAME.getId());
+		List<String> feedIds = reader.getProperties(FeedProperty.TABLE_NAME.getId());
 
 		// 2. Trim slashes
-		List<List<String>> idSublists = Lists.partition(ids, partitionSize);
+		List<List<String>> idSublists = Lists.partition(feedIds, partitionSize);
 		final ExecutorService executorService2 = Executors.newFixedThreadPool(threadCount);
 		for (List<String> sub : idSublists) {
 			executorService2.submit(new TrimFeeds(sub, reader));
@@ -164,8 +164,10 @@ public class Issue2410Test extends FeedServer {
 			reader.setFetchInterval(0, 0, 0);
 
 			// 4. Trim whitespace
+			List<String> itemIds = reader.getProperties(FeedItemProperty.TABLE_NAME.getId());
+			List<List<String>> itemIdSublists = Lists.partition(itemIds, partitionSize);
 			final ExecutorService executorService4 = Executors.newFixedThreadPool(threadCount);
-			for (List<String> sub : idSublists) {
+			for (List<String> sub : itemIdSublists) {
 				executorService4.submit(new TrimWhitespace(sub, reader));
 			}
 			executorService4.shutdown();
