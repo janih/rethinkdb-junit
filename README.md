@@ -1,6 +1,6 @@
 #rethinkdb-junit#
 
-This is a JUnit test project to reproduce https://github.com/rethinkdb/rethinkdb/issues/2410
+This is a JUnit test project to try to reproduce https://github.com/rethinkdb/rethinkdb/issues/2410
 
 ##Running the test##
 
@@ -20,7 +20,11 @@ Run:
 
 Maven should download the required dependencies and start running the test.
 
+##Test data##
 
-##Creating Ecplise project files##
+Any RSS xml files will do, just save files to *feedDataFolder*. There are some example files in *example_data* folder. 
+
+
+##How to create Eclipse project files##
 
 ```mvn eclipse:eclipse -DdownloadJavadocs=true -DdownloadSources=true```
